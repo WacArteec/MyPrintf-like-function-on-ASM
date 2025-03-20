@@ -1,11 +1,11 @@
 It's my printf-like function
-It support:
-            %x (signed)
-            %o (signed)
-            %d (like in printf from stdio.h)
-            %b (signed)
-            %s (like in printf from stdio.h)
-            %c (like in printf from stdio.h)
+It support: (ll specificators like in printf from stdio.h)
+            %x 
+            %o 
+            %d 
+            %b 
+            %s 
+            %c 
 
 Example how to use it in main.c, you can clone this repository and try yourself :)
 

@@ -103,15 +103,18 @@ ProcessFormat:
         ; Если нашли '%', читаем следующий символ
         mov al, byte [r12]
         inc r12
+        
+        cmp al, '%'
+        je .process_literal
 
-        jmp [(rax - '%') * 8 + .jump_table] ;код символа на размер адреса в табоице(8 из-за dq)
+        jmp [(rax - 'b') * 8 + .jump_table] ;код символа на размер адреса в табоице(8 из-за dq)
 
-    ; Jump-таблица для обработки спецификаторов (в формате адреса в нужном смещении)
+    ; Jump-таблица для обработки спецификаторов (в формате адреса в нужном смещении относительно %)
     .jump_table:
 
-                                dq .process_literal  ;'%'
+        ;                        dq .process_literal  ;'%'
 
-        times ('b' - '%' - 1)   dq .undefined_symb  ; для всех символов до b
+        ;times ('b' - '%' - 1)   dq .undefined_symb  ; для всех символов до b
 
                                 dq .handle_bin  ;'b'
 
@@ -272,20 +275,6 @@ ret
 
     .non_zero_convert:
 
-        test rax, MINUS_MASK
-        jz .unsigned
-
-        ; если число отрицательное – выводим знак
-        push rax
-        mov al, MINUS
-        call WriteChar
-        pop rax
-
-        neg rax
-        and rax, NEG_MASK
-
-    .unsigned:
-
         xor r10, r10          ; обнуляем счётчик цифр
 ret
 
@@ -329,6 +318,20 @@ ret
 ;   цифры помещены в стек, r10 содержит число цифр
 ;-----------------------------------------
 ConvertNumber10:
+
+        test rax, MINUS_MASK
+        jz .unsigned
+
+        ; если число отрицательное – выводим знак
+        push rax
+        mov al, MINUS
+        call WriteChar
+        pop rax
+
+        neg rax
+        and rax, NEG_MASK
+
+    .unsigned:
 
     .convert_loop:
 
